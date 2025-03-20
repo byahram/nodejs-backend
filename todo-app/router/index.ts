@@ -6,7 +6,7 @@ import { router as userRouter } from "./userRouter";
 const router = express.Router();
 
 router.use("/users", userRouter);
-// router.use("/categories", categoryRouter);
 // router.use("/tasks", taskRouter);
+// router.use("/categories", categoryRouter);
 
 export { router };
