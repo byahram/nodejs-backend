@@ -1,10 +1,14 @@
 import { NextFunction, Request, Response } from "express";
-import User, { IUser } from "../model/User";
+import { connectToDatabase } from "../../db";
+import { createUserModal, IUser } from "../model/User";
 import mongoose from "mongoose";
 
 export const userController = {
   getUser: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const User = createUserModal(db);
+
       const userId = (req as any).userId;
       if (!userId) {
         res
@@ -41,6 +45,9 @@ export const userController = {
     next: NextFunction
   ) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const User = createUserModal(db);
+
       const userId = (req as any).userId;
       const user = await User.findById(userId);
       if (user?.level !== "admin") {

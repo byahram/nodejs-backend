@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import User from "../model/User";
+import { connectToDatabase } from "../../db";
+import { createUserModal, IUser } from "../model/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -17,6 +18,9 @@ export const authController = {
   // 회원가입 (register)
   register: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const User = createUserModal(db);
+
       const { name, email, password, level } = req.body;
 
       const existingUser = await User.findOne({ email });
@@ -52,6 +56,9 @@ export const authController = {
   // 로그인 (loginWithEmail)
   loginWithEmail: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const User = createUserModal(db);
+
       const { email, password } = req.body;
 
       const user = await User.findOne({ email }).select(
