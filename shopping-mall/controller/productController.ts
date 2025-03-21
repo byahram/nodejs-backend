@@ -1,20 +1,24 @@
-import mongoose from "mongoose";
 import { Request, Response, RequestHandler } from "express";
-import Product, { IProduct } from "../model/Product";
+import { connectToDatabase } from "../../db";
+import { createProductModel, IProduct } from "../model/Product";
 
 const PAGE_SIZE = 5;
 
 export const productController = {
   getProducts: (async (req: Request, res: Response) => {
     try {
-      const { page, name } = req.query as { page?: string; name?: string };
-      const pageNumber = page ? parseInt(page, 10) : 1;
+      const db = await connectToDatabase("02-shopping-mall");
+      const Product = createProductModel(db);
+
+      const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
+      const name = req.query.name as string | undefined;
 
       const cond = name
         ? { name: { $regex: name, $options: "i" }, isDeleted: false }
         : { isDeleted: false };
 
-      let query = Product.find(cond);
+      let products = Product.find(cond);
+
       let response: {
         status: string;
         totalPageNum?: number;
@@ -22,7 +26,7 @@ export const productController = {
       } = { status: "success" };
 
       if (page) {
-        query = query.skip((pageNumber - 1) * PAGE_SIZE).limit(PAGE_SIZE);
+        products = products.skip((page - 1) * PAGE_SIZE).limit(PAGE_SIZE);
 
         // 전체 제품 및 페이지네이션
         const totalItemNum = await Product.countDocuments(cond);
@@ -30,7 +34,7 @@ export const productController = {
         response.totalPageNum = totalPageNum;
       }
 
-      const productList = await query.exec();
+      const productList = await products.exec();
       response.data = productList;
 
       return res.status(200).json(response);
@@ -44,6 +48,9 @@ export const productController = {
   }) as RequestHandler,
   getProductsDetail: (async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const Product = createProductModel(db);
+
       const { id } = req.params as { id: string };
 
       const product = await Product.findById(id);
@@ -64,6 +71,9 @@ export const productController = {
   }) as RequestHandler,
   addProduct: (async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("02-shopping-mall");
+      const Product = createProductModel(db);
+
       const {
         sku,
         name,

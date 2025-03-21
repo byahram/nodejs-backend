@@ -1,4 +1,4 @@
-import mongoose, { Document, Model, Schema } from "mongoose";
+import mongoose, { Connection, Document, Model, Schema } from "mongoose";
 
 export interface IProduct extends Document {
   sku: string;
@@ -14,33 +14,35 @@ export interface IProduct extends Document {
   isDeleted?: boolean;
 }
 
-const productSchema: Schema<IProduct> = new Schema(
-  {
-    sku: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
-    size: { type: [String], required: true },
-    thumbnail: { type: String, required: true },
-    detailImages: { type: [String] },
-    category: { type: [String], required: true },
-    description: { type: String, required: true },
-    price: { type: Number, required: true },
-    stock: { type: Object, required: true },
-    status: { type: String, default: "active" },
-    isDeleted: { type: Boolean, default: false },
-  },
-  { timestamps: true }
-);
+export const createProductModel = (db: Connection): Model<IProduct> => {
+  if (db.models.Product) {
+    return db.models.Product as Model<IProduct>;
+  }
 
-productSchema.methods.toJSON = function () {
-  const obj = this._doc;
-  delete obj.__v;
-  delete obj.updatedAt;
-  delete obj.createdAt;
-  return obj;
+  const productSchema: Schema<IProduct> = new Schema(
+    {
+      sku: { type: String, required: true, unique: true },
+      name: { type: String, required: true },
+      size: { type: [String], required: true },
+      thumbnail: { type: String, required: true },
+      detailImages: { type: [String] },
+      category: { type: [String], required: true },
+      description: { type: String, required: true },
+      price: { type: Number, required: true },
+      stock: { type: Object, required: true },
+      status: { type: String, default: "active" },
+      isDeleted: { type: Boolean, default: false },
+    },
+    { timestamps: true }
+  );
+
+  productSchema.methods.toJSON = function () {
+    const obj = this.toObject();
+    delete obj.__v;
+    delete obj.createdAt;
+    delete obj.updatedAt;
+    return obj;
+  };
+
+  return db.model<IProduct>("Product", productSchema);
 };
-
-const Product: Model<IProduct> = mongoose.model<IProduct>(
-  "Product",
-  productSchema
-);
-export default Product;

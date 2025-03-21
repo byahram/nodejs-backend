@@ -9,4 +9,4 @@ router.use("/product", productRouter);
 router.use("/user", userRouter);
 router.use("/auth", authRouter);
 
-export { router };
+export { router as shopRouter };
