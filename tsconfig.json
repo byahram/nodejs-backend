@@ -10,5 +10,5 @@
     "rootDir": "./",
     "resolveJsonModule": true
   },
-  "include": ["app.ts", "controller", "model", "router"]
+  "include": ["app.ts", "controller", "model", "routes"]
 }
