@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import morgan from "morgan";
 
 import { shopRouter } from "./shopping-mall/router/index";
+import { todoRouter } from "./todo-app/router/index";
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(morgan("dev"));
 
 // API 라우터
 app.use("/api/shop", shopRouter);
+app.use("/api/todo", todoRouter);
 
 // 404 예외 처리
 app.use((req, res) => {
