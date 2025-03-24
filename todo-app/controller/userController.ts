@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import User from "../model/User";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
+import { connectToDatabase } from "../../db";
+import { createUserModal } from "../../shopping-mall/model/User";
 
 const saltRounds = 10;
 
@@ -9,6 +10,9 @@ export const userController = {
   // 회원가입 (register)
   register: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("01-todo-app");
+      const User = createUserModal(db);
+
       const { name, email, password } = req.body;
 
       // User가 존재하는지 Check
@@ -41,6 +45,9 @@ export const userController = {
   // 로그인 (loginWithEmail)
   loginWithEmail: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("01-todo-app");
+      const User = createUserModal(db);
+
       const { email, password } = req.body;
 
       const user = await User.findOne({ email }).select(
@@ -78,6 +85,9 @@ export const userController = {
   // 유저 정보 가져오기 (getUser)
   getUser: async (req: Request, res: Response) => {
     try {
+      const db = await connectToDatabase("01-todo-app");
+      const User = createUserModal(db);
+
       const userId = (req as any).userId;
       if (!userId) {
         res.status(400).json({
