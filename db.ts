@@ -4,13 +4,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const MONGODB_BASE_URI = process.env.MONGODB_BASE_URI as string;
+const MONGODB_END_URL = process.env.MONGODB_END_URL as string;
 
 const connections: { [key: string]: mongoose.Connection } = {};
 
 export const connectToDatabase = async (
   dbName: string
 ): Promise<mongoose.Connection> => {
-  const mongoURI = `${MONGODB_BASE_URI}${dbName}`;
+  const mongoURI = `${MONGODB_BASE_URI}${dbName}?${MONGODB_END_URL}`;
 
   if (connections[dbName]) {
     console.log(`🔄 Using existing MongoDB connection for ${dbName}`);
